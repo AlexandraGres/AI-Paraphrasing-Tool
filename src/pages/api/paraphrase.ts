@@ -64,6 +64,8 @@ export default async function handler(
 
     const result = await Promise.race([openAiPromise, timeoutPromise]);
 
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+
     return res.status(200).json({ paraphrasedText: result });
   } catch (error) {
     console.error(
@@ -85,6 +87,8 @@ export default async function handler(
       );
 
       const firstSuccess = await Promise.any(fallbackPromises);
+
+      res.setHeader('Cache-Control', 'no-store, max-age=0');
 
       return res.status(200).json({ paraphrasedText: firstSuccess });
     } catch (fallbackError) {
