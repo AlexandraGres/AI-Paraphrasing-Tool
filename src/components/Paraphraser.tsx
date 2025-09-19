@@ -16,7 +16,7 @@ import { paraphraseText } from '@/services/paraphraseText';
 import styles from '@/styles/Paraphraser.module.scss';
 
 function Paraphraser() {
-  const [value, setValue] = useState('I love my mom');
+  const [value, setValue] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
