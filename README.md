@@ -81,7 +81,7 @@ yarn dev
 
 Once the server is running, you can access the application at:
 
-👉 http://localhost:3001
+👉 http://localhost:3000
 
 🎉 You're All Set!
 
