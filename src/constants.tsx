@@ -7,3 +7,5 @@ While Border Collies are generally healthy dogs, they may be prone to certain ge
 In summary, the Border Collie is a remarkable breed with outstanding intelligence, agility, and herding instincts. Whether as a working dog or a loyal family companion, they bring joy, enthusiasm, and unwavering devotion to their owners.`;
 
 export const REQUEST_TIMEOUT = 3000;
+
+export const UNKNOWN_ERROR = 'An unknown error occurred.';
