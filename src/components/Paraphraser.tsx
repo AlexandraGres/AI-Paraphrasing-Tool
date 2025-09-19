@@ -22,6 +22,7 @@ function Paraphraser() {
   const [success, setSuccess] = useState(false);
 
   const handleOnchange = (event: ChangeEvent<HTMLInputElement>) => {
+    setError('');
     setValue(event.currentTarget.value);
   };
 
@@ -47,6 +48,7 @@ function Paraphraser() {
   };
 
   const handlePasteText = async () => {
+    setError('');
     try {
       const clipText = await navigator.clipboard.readText();
       setValue(clipText);
@@ -56,17 +58,23 @@ function Paraphraser() {
   };
 
   const handleAddSampleText = () => {
+    setError('');
     setValue(SAMPLE_TEXT);
   };
 
   const handleClearInput = () => {
+    setError('');
     setValue('');
   };
 
   return (
     <Box className={styles.paraphraser}>
       <form onSubmit={handleSubmit}>
-        <FormControl error={!!error} fullWidth sx={{ pb: '68px' }}>
+        <FormControl
+          error={!!error}
+          fullWidth
+          sx={{ pb: '68px', alignItems: 'center' }}
+        >
           <TextField
             disabled={loading}
             className={styles.input}
@@ -93,13 +101,17 @@ function Paraphraser() {
               display='flex'
               sx={{
                 position: 'absolute',
-                top: '142px',
-                left: '50%',
-                transform: 'translate(-50%)',
+                justifyContent: 'center',
+                mt: '142px',
+                px: 9,
+                flexWrap: { xs: 'wrap', sm: 'nowrap' },
               }}
             >
               <Button
-                sx={{ mr: 1 }}
+                sx={{
+                  mr: { xs: 0, sm: 1 },
+                  mb: { xs: 1, sm: 0 },
+                }}
                 className={styles.insertButton}
                 variant='outlined'
                 startIcon={<ContentPasteOutlinedIcon />}

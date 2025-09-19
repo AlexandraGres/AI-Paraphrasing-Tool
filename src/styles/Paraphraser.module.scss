@@ -46,6 +46,7 @@
 
   .formFooter {
     height: 64px;
+    width: 100%;
     border-bottom-left-radius: 28px;
     border-bottom-right-radius: 28px;
     border: solid 1px #dbdcdf;
@@ -64,6 +65,7 @@
     background: #fff;
     display: flex;
     flex-direction: column;
+    margin-bottom: 16px;
 
     span {
       margin: 0;
