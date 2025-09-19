@@ -1,40 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { REQUEST_TIMEOUT, UNKNOWN_ERROR } from '@/constants';
 
-import { REQUEST_TIMEOUT } from '@/constants';
-
-interface AIProvider {
-  name: string;
-  apiKey: string | undefined;
-  apiEndpoint: string;
-  createPayload: (text: string) => object;
-  parseResponse: (data: any) => string;
-}
-
-const providers: AIProvider[] = [
-  {
-    name: 'OpenAI',
-    apiKey: process.env.OPENAI_API_KEY,
-    apiEndpoint: 'https://api.openai.com/v1/chat/completions',
-    createPayload: (text) => ({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: `Paraphrase: ${text}` }],
-    }),
-    parseResponse: (data) => data.choices[0].message.content.trim(),
-  },
-  {
-    name: 'Gemini',
-    apiKey: process.env.GEMINI_API_KEY,
-    apiEndpoint: `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
-    createPayload: (text) => ({
-      contents: [
-        {
-          parts: [{ text: `Paraphrase: ${text}` }],
-        },
-      ],
-    }),
-    parseResponse: (data) => data.candidates[0].content.parts[0].text.trim(),
-  },
-];
+import { AIProvider } from '@/types';
+import { providers } from '@/lib/aiProviders';
 
 async function makeRequest(
   provider: AIProvider,
@@ -58,6 +26,7 @@ async function makeRequest(
   }
 
   const data = await response.json();
+
   return provider.parseResponse(data);
 }
 
@@ -70,6 +39,7 @@ export default async function handler(
   const primaryProvider = providers.find(
     (p) => p.name === 'OpenAI' && p.apiKey
   );
+
   const fallbackProviders = providers.filter(
     (p) => p.name !== 'OpenAI' && p.apiKey
   );
@@ -82,6 +52,7 @@ export default async function handler(
 
   try {
     const openAiPromise = makeRequest(primaryProvider, text);
+
     const timeoutPromise = new Promise<never>((_, reject) =>
       setTimeout(
         () => reject(new Error('OpenAI request timed out')),
@@ -90,12 +61,15 @@ export default async function handler(
     );
 
     console.log('Attempting primary provider: OpenAI...');
+
     const result = await Promise.race([openAiPromise, timeoutPromise]);
 
     return res.status(200).json({ paraphrasedText: result });
-  } catch (error: any) {
+  } catch (error) {
     console.error(
-      `Primary provider failed: ${error.message}. Triggering fallback providers...`
+      `Primary provider failed: ${
+        error instanceof Error ? error.message : UNKNOWN_ERROR
+      }. Triggering fallback providers...`
     );
 
     if (fallbackProviders.length === 0) {
@@ -118,6 +92,7 @@ export default async function handler(
         'All fallback providers failed.',
         (fallbackError as AggregateError).errors
       );
+
       return res
         .status(503)
         .json({ error: 'All AI services are currently unavailable.' });
