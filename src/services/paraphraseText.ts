@@ -4,6 +4,7 @@ import { UNKNOWN_ERROR } from '@/constants';
 export async function paraphraseText(text: string): Promise<ParaphraseResult> {
   try {
     const response = await fetch('/api/paraphrase', {
+      cache: 'no-store',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text }),
